@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sistema Alexa</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI', sans-serif;
+    background:linear-gradient(135deg,#f5e6e1,#ffffff);
+}
+
+/* NAVBAR */
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 40px;
+    background:linear-gradient(90deg,#c8a79d,#793A2A);
+    color:white;
+}
+
+.logo{
+    font-size:28px;
+    font-family:Arial;
+    font-weight:bold;
+}
+
+.menu{
+    display:flex;
+    gap:20px;
+}
+
+.menu a{
+    color:white;
+    text-decoration:none;
+    cursor:pointer;
+}
+
+/* BOTONES */
+button{cursor:pointer;}
+
+.buttons button{
+    margin-left:10px;
+    padding:8px 15px;
+    border-radius:20px;
+    border:none;
+}
+
+.reg{background:transparent;border:1px solid white;color:white;}
+.login{background:white;color:#793A2A;}
+
+.btn{background:#793A2A;color:white;padding:10px;border:none;border-radius:8px;}
+
+.add{background:#793A2A;color:white;padding:10px;border:none;border-radius:8px;margin:5px;}
+.back{background:#c8a79d;padding:10px;border:none;border-radius:8px;}
+
+/* MODAL */
+.modal{
+    position:fixed;
+    width:100%;
+    height:100%;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,0.4);
+}
+
+.modal-content{
+    position:relative;
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    width:350px;
+    text-align:center;
+}
+
+.close{
+    position:absolute;
+    top:15px;
+    right:20px;
+    cursor:pointer;
+}
+
+/* INPUT */
+input,select{
+    width:90%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+    border:1px solid #ddd;
+}
+
+/* PANTALLAS */
+.pantalla{display:none;}
+
+.container{
+    width:80%;
+    margin:auto;
+    margin-top:20px;
+    background:white;
+    padding:20px;
+    border-radius:15px;
+}
+
+/* TABLA */
+table{width:100%;border-collapse:collapse;}
+th{background:#793A2A;color:white;}
+th,td{padding:10px;text-align:center;}
+
+/* CARDS */
+.card{
+    background:#f5e6e1;
+    padding:15px;
+    margin:10px 0;
+    border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="logo">ALEXA</div>
+
+    <div class="menu">
+        <a onclick="abrirDisenos()">Diseños</a>
+        <a onclick="abrirPlanes()">Planes</a>
+        <a>Citas</a>
+        <a onclick="mostrarAgenda()">Agendas</a>
+        <a>Ventas</a>
+    </div>
+
+    <div class="buttons">
+        <button class="reg" onclick="abrirRegistro()">Registrarte</button>
+        <button class="login" onclick="abrirLogin()">Iniciar sesión</button>
+    </div>
+</div>
+
+<!-- REGISTRO -->
+<div class="modal" id="modalRegistro">
+    <div class="modal-content">
+        <span class="close" onclick="cerrar()">✖</span>
+        <h2>Crear Cuenta</h2>
+        <input id="regEmail" placeholder="Correo">
+        <input id="regPass" type="password" placeholder="Contraseña">
+        <button class="btn" onclick="registrar()">Registrarse</button>
+    </div>
+</div>
+
+<!-- LOGIN -->
+<div class="modal" id="modalLogin">
+    <div class="modal-content">
+        <span class="close" onclick="cerrar()">✖</span>
+        <h2>Iniciar Sesión</h2>
+        <input id="loginEmail" placeholder="Correo">
+        <input id="loginPass" type="password" placeholder="Contraseña">
+        <button class="btn" onclick="login()">Entrar</button>
+
+        <p>O continuar con</p>
+        <button class="btn" onclick="loginDemo()">Google</button>
+        <button class="btn" onclick="loginDemo()">Facebook</button>
+    </div>
+</div>
+
+<!-- AGENDA -->
+<div id="agenda" class="pantalla">
+    <div class="container">
+        <button class="back" onclick="cerrarTodo()">⬅ Volver</button>
+        <button class="add" onclick="agregar()">+ Agregar</button>
+
+        <table>
+            <thead>
+                <tr><th>Nombre</th><th>Email</th></tr>
+            </thead>
+            <tbody id="tabla"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- DISEÑOS -->
+<div id="disenos" class="pantalla">
+    <div class="container">
+        <button class="back" onclick="cerrarTodo()">⬅ Volver</button>
+
+        <h2>🎨 Diseños</h2>
+
+        <input id="textoDiseno" placeholder="Escribe tu texto">
+
+        <select id="fuente">
+            <option value="serif">Elegante</option>
+            <option value="cursive">Manuscrita</option>
+            <option value="monospace">Formal</option>
+        </select>
+
+        <input type="number" id="tamano" placeholder="Tamaño">
+
+        <button class="add" onclick="aplicarDiseno()">Aplicar</button>
+        <button class="add" onclick="guardarDiseno()">Guardar</button>
+
+        <div class="card">
+            <h3 id="textoPreview">Tu texto aquí</h3>
+        </div>
+
+        <h3>📂 Guardados</h3>
+        <div id="listaDisenos"></div>
+    </div>
+</div>
+
+<!-- PLANES -->
+<div id="planes" class="pantalla">
+    <div class="container">
+        <button class="back" onclick="cerrarTodo()">⬅ Volver</button>
+
+        <h2>💡 Planes</h2>
+
+        <div class="card">Ropa <button class="add" onclick="usarPlan('Ropa')">Usar</button></div>
+        <div class="card">Cafetería <button class="add" onclick="usarPlan('Cafetería')">Usar</button></div>
+        <div class="card">Apps <button class="add" onclick="usarPlan('Apps')">Usar</button></div>
+
+        <h3>📌 Seleccionados</h3>
+        <div id="listaPlanes"></div>
+    </div>
+</div>
+
+<script>
+let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+let disenos = JSON.parse(localStorage.getItem("disenos")) || [];
+let planes = JSON.parse(localStorage.getItem("planes")) || [];
+
+/* MODALES */
+function abrirRegistro(){document.getElementById("modalRegistro").style.display="flex";}
+function abrirLogin(){document.getElementById("modalLogin").style.display="flex";}
+function cerrar(){
+document.getElementById("modalRegistro").style.display="none";
+document.getElementById("modalLogin").style.display="none";
+}
+
+/* REGISTRO */
+function registrar(){
+let email=document.getElementById("regEmail").value;
+let pass=document.getElementById("regPass").value;
+if(!email||!pass)return alert("Completa datos");
+usuarios.push({email,pass});
+localStorage.setItem("usuarios",JSON.stringify(usuarios));
+alert("Cuenta creada");
+cerrar();
+}
+
+/* LOGIN */
+function login(){
+let email=document.getElementById("loginEmail").value;
+let pass=document.getElementById("loginPass").value;
+let user=usuarios.find(u=>u.email===email && u.pass===pass);
+if(user){mostrarAgenda();}else{alert("Datos incorrectos");}
+}
+
+function loginDemo(){mostrarAgenda();}
+
+/* PANTALLAS */
+function ocultarTodo(){
+document.getElementById("agenda").style.display="none";
+document.getElementById("disenos").style.display="none";
+document.getElementById("planes").style.display="none";
+}
+
+function mostrarAgenda(){
+ocultarTodo();
+document.getElementById("agenda").style.display="block";
+mostrar();
+}
+
+function abrirDisenos(){
+ocultarTodo();
+document.getElementById("disenos").style.display="block";
+mostrarDisenos();
+}
+
+function abrirPlanes(){
+ocultarTodo();
+document.getElementById("planes").style.display="block";
+mostrarPlanes();
+}
+
+function cerrarTodo(){ocultarTodo();}
+
+/* AGENDA */
+function mostrar(){
+let t=document.getElementById("tabla");
+t.innerHTML="";
+usuarios.forEach(u=>{
+t.innerHTML+=`<tr><td>${u.email}</td><td>${u.email}</td></tr>`;
+});
+}
+
+function agregar(){
+let n=prompt("Nombre");
+let e=prompt("Email");
+if(n&&e){
+usuarios.push({email:e});
+localStorage.setItem("usuarios",JSON.stringify(usuarios));
+mostrar();
+}
+}
+
+/* DISEÑOS */
+function aplicarDiseno(){
+let texto=document.getElementById("textoDiseno").value;
+let fuente=document.getElementById("fuente").value;
+let tamano=document.getElementById("tamano").value;
+
+let p=document.getElementById("textoPreview");
+p.innerText=texto;
+p.style.fontFamily=fuente;
+p.style.fontSize=tamano+"px";
+}
+
+function guardarDiseno(){
+disenos.push(document.getElementById("textoPreview").innerText);
+localStorage.setItem("disenos",JSON.stringify(disenos));
+mostrarDisenos();
+}
+
+function mostrarDisenos(){
+let lista=document.getElementById("listaDisenos");
+lista.innerHTML="";
+disenos.forEach(d=>{
+lista.innerHTML+=`<div class="card">${d}</div>`;
+});
+}
+
+/* PLANES */
+function usarPlan(p){
+planes.push(p);
+localStorage.setItem("planes",JSON.stringify(planes));
+mostrarPlanes();
+}
+
+function mostrarPlanes(){
+let lista=document.getElementById("listaPlanes");
+lista.innerHTML="";
+planes.forEach(p=>{
+lista.innerHTML+=`<div class="card">${p}</div>`;
+});
+}
+</script>
+
+</body>
+</html>
